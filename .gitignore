@@ -1,2 +1,4 @@
 node_modules
 comandos-executados.sh
+.vscode
+.gitignore
