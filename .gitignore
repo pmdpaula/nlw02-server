@@ -2,3 +2,5 @@ node_modules
 comandos-executados.sh
 .vscode
 .gitignore
+src/database/database.sqlite
+src/database/database.sqlite
