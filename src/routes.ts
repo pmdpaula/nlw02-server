@@ -1,8 +1,5 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable import/extensions */
-import express from 'express';
-import db from './database/connection';
-import convertHourToMinutes from './utils/convertHourToMinutes';
 
 /**
  * GET:     Buscar ou listar uma informação
@@ -15,62 +12,18 @@ import convertHourToMinutes from './utils/convertHourToMinutes';
  * Query Params:  Paginação, filtros, ordenação (?page=XX&sort=name)
  */
 
+import express from 'express';
+import ClassesControler from './controllers/ClassesController';
+import ConnectionsController from './controllers/ConnectionsController';
+
 const routes = express.Router();
+const classesControllers = new ClassesControler();
+const connectionsController = new ConnectionsController();
 
-interface ScheduleItem {
-  week_day: number,
-  from: string,
-  to: string
-}
+routes.get('/classes', classesControllers.index);
+routes.post('/classes', classesControllers.create);
 
-routes.get('/', (request, response) => response.json({ message: 'Hello Pedrão!' }));
-
-routes.post('/classes', async (request, response) => {
-  const {
-    name,
-    avatar,
-    whatsapp,
-    bio,
-    subject,
-    cost,
-    schedule,
-  } = request.body;
-
-  // Cria uma transação para ou executar tudo ou fazer rollback
-  const trx = await db.transaction();
-
-  try {
-    const insertedUsersIds = await trx('users').insert({
-      name,
-      avatar,
-      whatsapp,
-      bio,
-    });
-
-    const insertedClassesIds = await trx('classes').insert({
-      subject,
-      cost,
-      user_id: insertedUsersIds[0],
-    });
-
-    const classSchedule = schedule.map((scheduleItem: ScheduleItem) => ({
-      class_id: insertedClassesIds,
-      week_day: scheduleItem.week_day,
-      from: convertHourToMinutes(scheduleItem.from),
-      to: convertHourToMinutes(scheduleItem.to),
-    }));
-
-    await trx('class_schedule').insert(classSchedule);
-
-    await trx.commit();
-
-    return response.status(201).send();
-  } catch (err) {
-    trx.rollback();
-    return response.status(400).json({
-      error: 'Unexpected error while creating new class',
-    });
-  }
-});
+routes.post('/connections', connectionsController.create);
+routes.get('/connections', connectionsController.index);
 
 export default routes;
