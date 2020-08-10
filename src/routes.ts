@@ -21,6 +21,7 @@ const classesControllers = new ClassesControler();
 const connectionsController = new ConnectionsController();
 
 routes.get('/classes', classesControllers.index);
+routes.get('/allclasses', classesControllers.indexesFromClass);
 routes.post('/classes', classesControllers.create);
 
 routes.post('/connections', connectionsController.create);
